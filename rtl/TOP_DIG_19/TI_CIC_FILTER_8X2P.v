@@ -1,0 +1,23 @@
+//`include "TI_POLYPHASE_PATH2_kai.v"
+//`include "TI_POLYPHASE_PATH8X2.v"
+
+module TI_CIC_FILTER_8X2P (IN1, IN2, IN3, IN4, CLK_adc1, CLK_adc1_2, CLK_adc2, CLK_adc3, CLK_adc4, RES, ENABLE, OUT1, OUT2);
+
+	 parameter BW = 6;
+
+	 input CLK_adc1, CLK_adc1_2, CLK_adc2, CLK_adc3, CLK_adc4, RES, ENABLE;
+	 input signed [BW-1:0] IN1, IN2, IN3, IN4;
+	 output signed [BW+4:0] OUT1, OUT2;
+	 wire signed [BW-1:0] OUT01, OUT02, OUT03, OUT04, OUT05, OUT06, OUT07, OUT08;
+	
+	 wire signed [BW-1:0] IN1_Z, ON1;
+	 DFFR_6B_4 DFF01 (IN1, CLK_adc1, RES, ENABLE, IN1_Z, ON1);
+
+	 TI_POLYPHASE_PATH2_kai POLYPHASE01(CLK_adc2, CLK_adc1_2, RES, ENABLE, IN1_Z, OUT01, OUT05),
+	                        POLYPHASE02(CLK_adc2, CLK_adc1_2, RES, ENABLE, IN2, OUT02, OUT06),
+			          POLYPHASE03(CLK_adc3, CLK_adc1_2, RES, ENABLE, IN3, OUT03, OUT07),
+			          POLYPHASE04(CLK_adc4, CLK_adc1_2, RES, ENABLE, IN4, OUT04, OUT08);
+
+	 TI_POLYPHASE_PATH8X2 POLYPHASE05(CLK_adc1_2, RES, OUT01, OUT02, OUT03, OUT04, OUT05, OUT06, OUT07, OUT08, OUT1, OUT2);	 
+
+endmodule
